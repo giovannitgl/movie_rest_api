@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, Unique} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, Unique, OneToMany} from "typeorm";
+import {Rating} from "./Rating";
 
 export enum UserTypes {
     Admin,
@@ -28,9 +29,11 @@ export class User {
     age: number;
 
     @Column('int')
-    type: UserTypes
+    type: UserTypes;
 
     @Column('bool', {default: true})
-    active: boolean
+    active: boolean;
 
+    @OneToMany(() => Rating, (rt: Rating) => rt.user )
+    ratings: Rating[];
 }
