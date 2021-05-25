@@ -1,0 +1,24 @@
+# Raises service for backend + postgres
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres:13.3-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: CHANGEME
+      POSTGRES_DB: movies
+    ports:
+      - "5432:5432"
+    
+  backend:
+    build: .
+    depends_on: 
+      - db
+    environment: 
+      DATABASE_URL: postgres://admin:CHANGEME@db:5432/movies
+    command: npm run start:dev
+
+

@@ -1,0 +1,364 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"UserDTO": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"age": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"email",
+					"firstName",
+					"lastName",
+					"age"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"UserCreateDTO": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"firstName": {
+						"type": "string"
+					},
+					"lastName": {
+						"type": "string"
+					},
+					"age": {
+						"type": "number",
+						"format": "double"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"firstName",
+					"lastName",
+					"age",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": true
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "movie_rest_api",
+		"version": "0.0.0",
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/user/{id}": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves user by id",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "User id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				},
+				"description": "Excludes user from system",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to exclude",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Updates information for an user",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to update",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "user data to be updated",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user": {
+			"post": {
+				"operationId": "RegisterUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Creates user",
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "Formatted user data to be created",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/{id}": {
+			"get": {
+				"operationId": "GetAdmin",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves an admin by id",
+				"tags": [
+					"Admin"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteAdmin",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				},
+				"description": "Excludes admin from system",
+				"tags": [
+					"Admin"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to exclude",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateAdmin",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Updates information for an admin",
+				"tags": [
+					"Admin"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to update",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "user data to be updated",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin": {
+			"post": {
+				"operationId": "RegisterAdmin",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Register a new administrator",
+				"tags": [
+					"Admin"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "Body of the user to be created as admin",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
