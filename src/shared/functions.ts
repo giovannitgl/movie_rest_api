@@ -27,11 +27,3 @@ export function getFilterPagination(filter: ListFilterDTO) {
     const {page, entries} = filter
     return {skip: page * entries, take: entries}
 }
-
-/**
- * Hashes a password with salt
- * @param pwd
- */
-export function hashPassword(pwd: string): string {
-    return bcrypt.hashSync(pwd, 10)
-}

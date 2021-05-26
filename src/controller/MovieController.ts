@@ -1,8 +1,19 @@
 import StatusCodes from 'http-status-codes';
-import {ErrorHandler} from "../middleware/ErrorMiddleware";
+import {ErrorHandler, IErrorHandler} from "../middleware/ErrorMiddleware";
 import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
-import {Body, Get, Path, Post, Request, Route, Security, Tags} from 'tsoa';
+import {
+    Body,
+    Get,
+    Path,
+    Post,
+    Request,
+    Response,
+    Route,
+    Security,
+    SuccessResponse,
+    Tags
+} from 'tsoa';
 import {User} from "../entity/User";
 import {printValidationError} from "../shared/functions";
 import {
@@ -26,6 +37,8 @@ export default class MovieController {
      * @param id {int} User id
      */
     @Get('/:id')
+    @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('400', 'Bad id')
     public async getMovieDetails(@Path() id: number): Promise<MovieDetailDTO> {
         if (isNaN(id)) {
             throw new ErrorHandler(BAD_REQUEST, 'Movie id must be an int')
@@ -63,11 +76,13 @@ export default class MovieController {
 
     /**
      * Register a movie in the system.
-     * Only allowed by admins.
-     * @param body {MovieCreateDTO} Formatted user data to be created
+     * Authenticated Endpoint: Admins
+     * @param body {MovieCreateDTO} - Formatted user data to be created
      */
     @Security('jwt', ['Admin'])
     @Post('/')
+    @SuccessResponse("201", "Created")
+    @Response<IErrorHandler>('400', 'Invalid Data')
     public async registerMovie(@Body() body: MovieCreateDTO): Promise<MovieDTO> {
         const movie: MovieCreateDTO = plainToClass(MovieCreateDTO, body)
 
@@ -89,9 +104,18 @@ export default class MovieController {
         return await createMovie(movieCreateData)
     }
 
+    /**
+     * Rate a movie.
+     * Authenticated method: Users
+     * @param id {int} - Movie id being rated
+     * @param payload {RateRequestDTO} - Payload with the value of the rating
+     * @param user {User} - User voting
+     */
     @Security('jwt', ['User'])
     @Post('/:id/rate')
-    public async registerRate(@Path() movieId: number, @Body() payload: RateRequestDTO, @Request() user: User): Promise<RateRequestDTO> {
+    @Response<IErrorHandler>('400', 'Invalid Data')
+    @Response<IErrorHandler>('404', 'Not found')
+    public async registerRate(@Path() id: number, @Body() payload: RateRequestDTO, @Request() user: User): Promise<RateRequestDTO> {
         const rating: RateRequestDTO = plainToClass(RateRequestDTO, payload)
         try {
             const validation = await validate(rating)
@@ -102,14 +126,14 @@ export default class MovieController {
             throw new ErrorHandler(BAD_REQUEST, err)
         }
 
-        const movie: MovieDTO = await getMovieById(movieId)
+        const movie: MovieDTO = await getMovieById(id)
         if (!movie) {
             throw new ErrorHandler(NOT_FOUND, 'Movie not found.')
         }
 
         const ratingEntity: RateCreateDTO = {
             ...rating,
-            movieId,
+            movieId: id,
             userId: user.id
         }
         await createRating(ratingEntity)

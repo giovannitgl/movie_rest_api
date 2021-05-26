@@ -1,12 +1,26 @@
 import StatusCodes from 'http-status-codes';
-import {ErrorHandler} from "../middleware/ErrorMiddleware";
+import {ErrorHandler, IErrorHandler} from "../middleware/ErrorMiddleware";
 import {UserCreateDTO, UserDisplayDTO, UserDTO, UserInternalDTO} from "../dto/UserDTO";
 import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
-import {Body, Delete, Get, Hidden, Path, Post, Put, Route, Security, Tags, Request} from 'tsoa';
+import {
+    Body,
+    Delete,
+    Get,
+    Hidden,
+    Path,
+    Post,
+    Put,
+    Route,
+    Security,
+    Tags,
+    Request,
+    Response, SuccessResponse
+} from 'tsoa';
 import {User, UserTypes} from "../entity/User";
 import {createUser, getUserById, updateUser} from "../dao/UserDAO";
-import {hashPassword, printValidationError} from "../shared/functions";
+import {printValidationError} from "../shared/functions";
+import {hashPassword} from "../shared/auth";
 
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, UNAUTHORIZED} = StatusCodes;
 
@@ -19,6 +33,8 @@ export default class UserController {
      */
     @Security('jwt', ['User'])
     @Get('/:id')
+    @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('400', 'Bad id')
     public async getUser(@Path() id: number): Promise<UserDTO> {
         if (isNaN(id)) {
             throw new ErrorHandler(BAD_REQUEST, 'User id must be an int')
@@ -32,12 +48,13 @@ export default class UserController {
         return getUserDTO(user)
     }
 
-
     /**
      * Creates user
      * @param body {UserCreateDTO} Formatted user data to be created
      */
-    @Post('/')
+    @Post('/register')
+    @SuccessResponse("201", "Created")
+    @Response<IErrorHandler>('400', 'Invalid data')
     public async registerUser(@Body() body: UserCreateDTO): Promise<UserDTO> {
         const user: UserCreateDTO = plainToClass(UserCreateDTO, body)
         try {
@@ -61,6 +78,8 @@ export default class UserController {
      */
     @Delete('/:id')
     @Security('jwt', ['User', 'Admin'])
+    @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('401', 'Unauthorized operation')
     public async deleteUser(@Path() id: number, @Request() @Hidden() requestUser: User): Promise<boolean> {
         if (requestUser.type !== UserTypes.Admin && requestUser.id != id)  {
             throw new ErrorHandler(UNAUTHORIZED, 'User cannot delete other users.')
@@ -84,6 +103,8 @@ export default class UserController {
      */
     @Put('/:id')
     @Security('jwt', ['User'])
+    @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('400', 'Invalid Data')
     public async updateUser(@Path() id: number, @Body() body: UserDTO, @Request() requestUser: User): Promise<UserDTO> {
         if (requestUser.id !== id) {
             throw new ErrorHandler(UNAUTHORIZED, 'User can only edit himself')

@@ -1,7 +1,12 @@
 import {Response} from "express";
 import logger from "../shared/Logger";
 
-export class ErrorHandler extends Error {
+export interface IErrorHandler {
+    statusCode: number
+    message: string
+}
+
+export class ErrorHandler extends Error implements IErrorHandler {
     /** Generic error handler for API **/
     statusCode: number
     message: string

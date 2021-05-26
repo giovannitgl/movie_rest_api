@@ -1,13 +1,15 @@
 {
   "name": "movie_rest_api",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "build": "tsc --skipLibCheck",
     "lint": "eslint . --ext .ts",
-    "start": "tsc --skipLibCheck && node ./dist/src/index.js --env=production",
+    "start": "tsc --skipLibCheck && sed -i 's/src/dist\\/src/g' ./dist/ormconfig.js && sed -i s/\\.ts/\\.js/g ./dist/ormconfig.js && node ./dist/src/index.js --env=production",
     "start:dev": "nodemon",
     "test": "jest",
-    "swagger": "tsoa spec"
+    "swagger": "tsoa spec",
+    "migrate:run": "node ./node_modules/typeorm/cli.js migration:run",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "nodemonConfig": {
     "watch": [

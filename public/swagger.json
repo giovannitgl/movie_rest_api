@@ -31,6 +31,23 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"IErrorHandler": {
+				"properties": {
+					"statusCode": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"statusCode",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UserCreateDTO": {
 				"properties": {
 					"email": {
@@ -88,6 +105,40 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"MovieDetailDTO": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"synopsis": {
+						"type": "string"
+					},
+					"director": {
+						"type": "string"
+					},
+					"genre": {
+						"type": "string"
+					},
+					"actors": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"rating": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"title",
+					"director",
+					"genre",
+					"actors",
+					"rating"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ActorDTO": {
 				"properties": {
 					"id": {
@@ -133,22 +184,67 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"MovieCreateDTO": {
+				"description": "DTO used for creation of movies.\nActors will be translated from String array to an array of objects containing the actor name",
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"synopsis": {
+						"type": "string"
+					},
+					"director": {
+						"type": "string"
+					},
+					"genre": {
+						"type": "string"
+					},
+					"actors": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"title",
+					"director",
+					"genre",
+					"actors"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RateRequestDTO": {
+				"properties": {
+					"rating": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"rating"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
 			"jwt": {
-				"name": "jwt",
-				"type": "jwt",
-				"scopes": {
-					"admin": "admin",
-					"user": "user"
-				}
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"scopes": [
+					"admin",
+					"user"
+				]
 			}
 		}
 	},
 	"info": {
 		"title": "movie_rest_api",
-		"version": "0.0.0",
+		"version": "0.0.1",
 		"contact": {}
 	},
 	"openapi": "3.0.0",
@@ -163,6 +259,26 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad id",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
 								}
 							}
 						}
@@ -201,6 +317,26 @@
 							"application/json": {
 								"schema": {
 									"type": "boolean"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
 								}
 							}
 						}
@@ -243,6 +379,26 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
 				"description": "Updates information for an user",
@@ -281,16 +437,26 @@
 				}
 			}
 		},
-		"/user": {
+		"/user/register": {
 			"post": {
 				"operationId": "RegisterUser",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
 								}
 							}
 						}
@@ -328,6 +494,26 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "Bad id",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
 				"description": "Retrieves an admin by id",
@@ -359,9 +545,19 @@
 								}
 							}
 						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
-				"description": "Excludes admin from system",
+				"description": "Excludes admin from system\nAuthenticated Endpoint: Admins",
 				"tags": [
 					"Admin"
 				],
@@ -397,9 +593,29 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "Invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
-				"description": "Updates information for an admin",
+				"description": "Updates information for an admin\nAuthenticated Endpoint: Admins",
 				"tags": [
 					"Admin"
 				],
@@ -435,16 +651,26 @@
 				}
 			}
 		},
-		"/admin": {
+		"/admin/register": {
 			"post": {
 				"operationId": "RegisterAdmin",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
 								}
 							}
 						}
@@ -482,6 +708,16 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "Invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -509,7 +745,29 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/MovieDetailDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad id",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
 							}
 						}
 					}
@@ -537,8 +795,8 @@
 			"post": {
 				"operationId": "RegisterMovie",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -546,9 +804,19 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
-				"description": "Register a movie in the system.\nOnly allowed by admins.",
+				"description": "Register a movie in the system.\nAuthenticated Endpoint: Admins",
 				"tags": [
 					"Movie"
 				],
@@ -561,12 +829,83 @@
 				],
 				"parameters": [],
 				"requestBody": {
-					"description": "Formatted user data to be created",
+					"description": "- Formatted user data to be created",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UserCreateDTO"
+								"$ref": "#/components/schemas/MovieCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/movie/{id}/rate": {
+			"post": {
+				"operationId": "RegisterRate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RateRequestDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					}
+				},
+				"description": "Rate a movie.\nAuthenticated method: Users",
+				"tags": [
+					"Movie"
+				],
+				"security": [
+					{
+						"jwt": [
+							"User"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"description": "- Movie id being rated",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "- Payload with the value of the rating",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RateRequestDTO"
 							}
 						}
 					}

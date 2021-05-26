@@ -39,7 +39,7 @@ createConnection().then(() => {
     );
 
     // Show routes called in console during development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
         app.use(morgan('dev'));
     }
 
@@ -59,7 +59,14 @@ createConnection().then(() => {
         ErrorMiddleware(err, res)
     });
 
-}).catch((err) => logger.err(err))
+    app.use(function notFoundHandler(_req, res: Response) {
+        res.status(405).send({
+            message: `Cannot use METHOD: ${_req.method} to ${_req.path}`
+        });
+    });
+
+
+}).catch((err) => console.error(err))
 
 // Export express instance
 export default app;

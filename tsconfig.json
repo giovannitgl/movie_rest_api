@@ -69,7 +69,9 @@
 //  "include": [
 //    "src/**/*.ts"
 //  ],
-//  "exclude": [
-//    "src/public/"
-//  ]
+  "exclude": [
+    "src/public/",
+    "test/",
+    "jest.config.js"
+  ]
 }

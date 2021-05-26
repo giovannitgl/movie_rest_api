@@ -1,23 +1,24 @@
 {
-"entryFile": "src/index.ts",
-  "controllerPathGlobs": ["src/controller/*.ts"],
+  "entryFile": "src/index.ts",
+  "controllerPathGlobs": [
+    "src/controller/*.ts"
+  ],
   "noImplicitAdditionalProperties": "silently-remove-extras",
   "spec": {
     "outputDirectory": "public",
     "specVersion": 3,
     "securityDefinitions": {
       "jwt": {
-        "name": "jwt",
-        "type": "jwt",
-        "scopes": {
-          "admin": "admin",
-          "user": "user"
-        }
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "scopes": ["admin", "user"]
       }
+
+    },
+    "routes": {
+      "routesDir": "dist",
+      "authenticationModule": "./authentication.ts"
     }
-  },
-  "routes": {
-    "routesDir": "dist",
-    "authenticationModule": "src/authentication.ts"
   }
 }
