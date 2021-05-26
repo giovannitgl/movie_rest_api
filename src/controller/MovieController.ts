@@ -10,13 +10,13 @@ import {
     MovieCreateDTO, MovieDetailDTO,
     MovieDTO,
     MovieFilterDTO,
-    RateCreateDTO,
+    RateCreateDTO, RateRequestDTO,
 } from "../dto/MovieDTO";
 import {createMovie, filterMovies, getMovieById} from "../dao/MovieDAO";
 import {createRating, getRateAvgByMovieId} from "../dao/RatingDAO";
 import {Movie} from "../entity/Movie";
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
+const { BAD_REQUEST, NOT_FOUND, } = StatusCodes;
 
 @Route('movie')
 @Tags('Movie')
@@ -91,8 +91,8 @@ export default class MovieController {
 
     @Security('jwt', ['User'])
     @Post('/:id/rate')
-    public async registerRate(@Path() movieId: number, @Body() payload: RateCreateDTO, @Request() user: User): Promise<RateCreateDTO> {
-        const rating: RateCreateDTO = plainToClass(RateCreateDTO, payload)
+    public async registerRate(@Path() movieId: number, @Body() payload: RateRequestDTO, @Request() user: User): Promise<RateRequestDTO> {
+        const rating: RateRequestDTO = plainToClass(RateRequestDTO, payload)
         try {
             const validation = await validate(rating)
             if (validation.length > 0) {

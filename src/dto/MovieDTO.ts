@@ -13,6 +13,7 @@ export class MovieFilterDTO extends ListFilterDTO {
     @IsOptional()
     actor?: string | Array<string>
 }
+
 export class BaseMovieDTO {
     @IsDefined()
     @IsString()
