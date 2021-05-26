@@ -92,15 +92,20 @@ describe('Movie Controller', () => {
                 genre: 'Programming',
                 actors: ['T. Est Jr., T. Est #2']
             };
+
+            (typeorm as any).getRepository.mockReturnValue({
+                createQueryBuilder: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
+                offset: jest.fn().mockReturnThis(),
+                take: jest.fn().mockReturnThis(),
+                getManyAndCount: () => Promise.resolve(['data', 0])
+            })
+
             const filter: MovieFilterDTO = {
                 page: 0,
                 entries: 10
             };
-
-            (typeorm as any).getRepository.mockReturnValue({
-                find: () => Promise.resolve([{...movieData, id: 0}]),
-            })
-            const user = await controller.listMovies(filter)
+            const user = await controller.listMovies(filter.page, filter.entries)
             expect(user).toBeDefined()
         })
         it('Failure: bad filter', async () => {
@@ -109,7 +114,7 @@ describe('Movie Controller', () => {
                 entries: 10
             };
             try {
-                await controller.listMovies(filter as any)
+                await controller.listMovies(filter.page as any, filter.entries)
             } catch (err) {
                 expect(err.statusCode).toBe(400)
             }

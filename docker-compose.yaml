@@ -19,6 +19,8 @@ services:
       - db
     environment: 
       DATABASE_URL: postgres://admin:CHANGEME@db:5432/movies
-    command: npm run start:dev
+    command: sh -c "npm run typeorm migration:run && exec npm run start:dev"
+    ports:
+      - "3000:3000"
 
 
