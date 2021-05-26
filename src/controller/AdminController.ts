@@ -1,5 +1,5 @@
 import StatusCodes from 'http-status-codes';
-import {Body, Delete, Get, Path, Post, Put, Route, Tags} from "tsoa";
+import {Body, Delete, Get, Path, Post, Put, Route, Security, Tags, Request} from "tsoa";
 import {UserCreateDTO, UserDTO} from "../dto/UserDTO";
 import {ErrorHandler} from "../middleware/ErrorMiddleware";
 import {User, UserTypes} from "../entity/User";
@@ -9,7 +9,7 @@ import {hashPassword, printValidationError} from "../shared/functions";
 import {createTypedUser, getUserDTO} from "./UserController";
 import {getUserById, updateUser} from "../dao/UserDAO";
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
+const { BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } = StatusCodes;
 
 
 @Route('admin')
@@ -60,6 +60,7 @@ export default class AdminController {
      * Excludes admin from system
      * @param id {int} user id to exclude
      */
+    @Security('jwt', ['Admin'])
     @Delete('/:id')
     public async deleteAdmin(@Path() id: number): Promise<boolean> {
         const user = await getUserById(id)
@@ -76,9 +77,15 @@ export default class AdminController {
      * Updates information for an admin
      * @param id {int} user id to update
      * @param body {UserDTO} user data to be updated
+     * @param requestUser {User} User that made the request
      */
+    @Security('jwt', ['Admin'])
     @Put('/:id')
-    public async updateAdmin(@Path() id: number, @Body() body: UserDTO): Promise<UserDTO> {
+    public async updateAdmin(@Path() id: number, @Body() body: UserDTO, @Request() requestUser: User): Promise<UserDTO> {
+        if (requestUser.id !== id) {
+            throw new ErrorHandler(UNAUTHORIZED, 'Admin can only edit itself')
+        }
+
         const user = await getUserById(id)
         if (!user) {
             throw new ErrorHandler(NOT_FOUND, 'User not found.')

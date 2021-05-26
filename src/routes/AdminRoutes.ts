@@ -1,6 +1,7 @@
 import express from "express";
 import StatusCodes from 'http-status-codes';
 import AdminController from "../controller/AdminController";
+import {authenticateMiddleware} from "../middleware/AuthenticationMiddleware";
 
 const { CREATED, OK} = StatusCodes;
 
@@ -18,13 +19,17 @@ router.post("/register", async (req, res) => {
     return res.status(CREATED).json(user)
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id",
+    authenticateMiddleware('jwt', ['Admin']),
+    async (req, res) => {
     const controller = new AdminController();
-    const user = await controller.updateAdmin(parseInt(req.params.id), req.body);
+    const user = await controller.updateAdmin(parseInt(req.params.id), req.body, req['user']);
     return res.status(OK).json(user)
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",
+    authenticateMiddleware('jwt', ['Admin']),
+    async (req, res) => {
     const controller = new AdminController();
     await controller.deleteAdmin(parseInt(req.params.id));
     return res.status(OK)

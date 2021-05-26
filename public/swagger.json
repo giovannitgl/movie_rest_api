@@ -29,7 +29,7 @@
 					"age"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
 			},
 			"UserCreateDTO": {
 				"properties": {
@@ -58,7 +58,35 @@
 					"password"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
+			},
+			"AuthDTO": {
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthRequestDTO": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"ActorDTO": {
 				"properties": {
@@ -74,7 +102,7 @@
 					"name"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
 			},
 			"MovieDTO": {
 				"properties": {
@@ -104,10 +132,19 @@
 					"actors"
 				],
 				"type": "object",
-				"additionalProperties": true
+				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"jwt": {
+				"name": "jwt",
+				"type": "jwt",
+				"scopes": {
+					"admin": "admin",
+					"user": "user"
+				}
+			}
+		}
 	},
 	"info": {
 		"title": "movie_rest_api",
@@ -135,7 +172,13 @@
 				"tags": [
 					"User"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"User"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"description": "User id",
@@ -167,7 +210,14 @@
 				"tags": [
 					"User"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"User",
+							"Admin"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"description": "user id to exclude",
@@ -199,7 +249,13 @@
 				"tags": [
 					"User"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"User"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"description": "user id to update",
@@ -309,7 +365,13 @@
 				"tags": [
 					"Admin"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"Admin"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"description": "user id to exclude",
@@ -341,7 +403,13 @@
 				"tags": [
 					"Admin"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"Admin"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"description": "user id to update",
@@ -401,6 +469,38 @@
 				}
 			}
 		},
+		"/auth": {
+			"post": {
+				"operationId": "Authenticate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthDTO"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthRequestDTO"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/movie/{id}": {
 			"get": {
 				"operationId": "GetMovieDetails",
@@ -409,9 +509,7 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
-								}
+								"schema": {}
 							}
 						}
 					}
@@ -433,81 +531,6 @@
 						}
 					}
 				]
-			},
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "boolean"
-								}
-							}
-						}
-					}
-				},
-				"description": "Excludes user from system",
-				"tags": [
-					"Movie"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"description": "user id to exclude",
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"put": {
-				"operationId": "UpdateUser",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
-								}
-							}
-						}
-					}
-				},
-				"description": "Updates information for an user",
-				"tags": [
-					"Movie"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"description": "user id to update",
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"description": "user data to be updated",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserDTO"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/movie": {
@@ -529,7 +552,13 @@
 				"tags": [
 					"Movie"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"Admin"
+						]
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"description": "Formatted user data to be created",

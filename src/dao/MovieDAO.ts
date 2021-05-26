@@ -20,7 +20,7 @@ export async function filterMovies(filter: MovieFilterDTO): Promise<Array<Movie>
  */
 export async function getMovieById(id:number): Promise<Movie | null> {
     const movieRepo = getRepository(Movie)
-    return movieRepo.findOne(id)
+    return movieRepo.findOne(id, {relations: ['actors']})
 }
 
 /**

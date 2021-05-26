@@ -17,6 +17,17 @@ export async function getUserById(id: number, type?: UserTypes): Promise<User | 
 }
 
 /**
+ * Gets an user by his email
+ * @param id
+ * @param type
+ */
+export async function getUserByEmail(email: string): Promise<User | null> {
+    const userRepo = getRepository(User)
+    return userRepo.findOne({email})
+}
+
+
+/**
  * Creates an user
  * @param payload {UserDTO} - user information to be created
  * @returns {User} - User created

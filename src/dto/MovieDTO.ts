@@ -1,5 +1,5 @@
 import {ListFilterDTO} from "./ListDTO";
-import {IsArray, IsDefined, IsInt, IsOptional, IsString} from "class-validator";
+import {IsArray, IsDefined, IsInt, IsOptional, IsString, Max, Min} from "class-validator";
 
 export class MovieFilterDTO extends ListFilterDTO {
     @IsOptional()
@@ -35,10 +35,14 @@ export class BaseMovieDTO {
  * DTO used for creation of movies.
  * Actors will be translated from String array to an array of objects containing the actor name
  */
-export class MovieCreateDTO extends  BaseMovieDTO {
+export class MovieCreateDTO extends BaseMovieDTO {
     @IsDefined()
     @IsArray()
     actors: Array<string>
+}
+
+export class MovieDetailDTO extends  MovieCreateDTO {
+    rating: string
 }
 
 export class MovieDTO extends BaseMovieDTO {
@@ -52,4 +56,18 @@ export class ActorDTO {
     @IsDefined()
     @IsString()
     name: string
+}
+
+export class RateRequestDTO {
+    @IsDefined()
+    @IsInt()
+    @Min(0)
+    @Max(4)
+    rating: number
+}
+
+export class RateCreateDTO extends RateRequestDTO {
+    userId: number
+
+    movieId: number
 }

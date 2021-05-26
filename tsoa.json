@@ -1,11 +1,23 @@
 {
 "entryFile": "src/index.ts",
   "controllerPathGlobs": ["src/controller/*.ts"],
+  "noImplicitAdditionalProperties": "silently-remove-extras",
   "spec": {
     "outputDirectory": "public",
-    "specVersion": 3
+    "specVersion": 3,
+    "securityDefinitions": {
+      "jwt": {
+        "name": "jwt",
+        "type": "jwt",
+        "scopes": {
+          "admin": "admin",
+          "user": "user"
+        }
+      }
+    }
   },
   "routes": {
-    "routesDir": "dist"
+    "routesDir": "dist",
+    "authenticationModule": "src/authentication.ts"
   }
 }

@@ -12,6 +12,7 @@ import {createConnection} from "typeorm";
 import UserRouter from "./routes/UserRoutes";
 import AdminRouter from "./routes/AdminRoutes";
 import MovieRouter from "./routes/MovieRoutes";
+import AuthRouter from "./routes/AuthRoutes";
 
 import logger from "./shared/Logger";
 
@@ -47,6 +48,7 @@ createConnection().then(() => {
         app.use(helmet());
     }
 
+    app.use("/auth", AuthRouter)
     app.use("/user", UserRouter)
     app.use("/admin", AdminRouter)
     app.use("/movie", MovieRouter)

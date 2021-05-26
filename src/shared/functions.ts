@@ -33,6 +33,5 @@ export function getFilterPagination(filter: ListFilterDTO) {
  * @param pwd
  */
 export function hashPassword(pwd: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return bcrypt.hashSync(pwd, 10) as string
+    return bcrypt.hashSync(pwd, 10)
 }

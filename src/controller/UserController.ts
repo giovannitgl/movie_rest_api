@@ -3,12 +3,12 @@ import {ErrorHandler} from "../middleware/ErrorMiddleware";
 import {UserCreateDTO, UserDisplayDTO, UserDTO, UserInternalDTO} from "../dto/UserDTO";
 import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
-import {Body, Delete, Get, Path, Post, Put, Route, Tags} from 'tsoa';
+import {Body, Delete, Get, Hidden, Path, Post, Put, Route, Security, Tags, Request} from 'tsoa';
 import {User, UserTypes} from "../entity/User";
 import {createUser, getUserById, updateUser} from "../dao/UserDAO";
 import {hashPassword, printValidationError} from "../shared/functions";
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
+const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, UNAUTHORIZED} = StatusCodes;
 
 @Route('user')
 @Tags('User')
@@ -17,6 +17,7 @@ export default class UserController {
      * Retrieves user by id
      * @param id {int} User id
      */
+    @Security('jwt', ['User'])
     @Get('/:id')
     public async getUser(@Path() id: number): Promise<UserDTO> {
         if (isNaN(id)) {
@@ -56,9 +57,15 @@ export default class UserController {
     /**
      * Excludes user from system
      * @param id {int} user id to exclude
+     * @param requestUser {User} the logged in user that made the request
      */
     @Delete('/:id')
-    public async deleteUser(@Path() id: number): Promise<boolean> {
+    @Security('jwt', ['User', 'Admin'])
+    public async deleteUser(@Path() id: number, @Request() @Hidden() requestUser: User): Promise<boolean> {
+        if (requestUser.type !== UserTypes.Admin && requestUser.id != id)  {
+            throw new ErrorHandler(UNAUTHORIZED, 'User cannot delete other users.')
+        }
+
         const user = await getUserById(id)
         if (!user) {
             throw new ErrorHandler(NOT_FOUND, 'User not found.')
@@ -73,9 +80,15 @@ export default class UserController {
      * Updates information for an user
      * @param id {int} user id to update
      * @param body {UserDTO} user data to be updated
+     * @param requestUser {User} the logged in user that made the request
      */
     @Put('/:id')
-    public async updateUser(@Path() id: number, @Body() body: UserDTO): Promise<UserDTO> {
+    @Security('jwt', ['User'])
+    public async updateUser(@Path() id: number, @Body() body: UserDTO, @Request() requestUser: User): Promise<UserDTO> {
+        if (requestUser.id !== id) {
+            throw new ErrorHandler(UNAUTHORIZED, 'User can only edit himself')
+        }
+
         const user = await getUserById(id)
         if (!user) {
             throw new ErrorHandler(NOT_FOUND, 'User not found.')
