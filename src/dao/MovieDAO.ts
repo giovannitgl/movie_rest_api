@@ -1,6 +1,6 @@
 import {MovieDTO, MovieFilterDTO} from "../dto/MovieDTO";
 import {Movie} from "../entity/Movie";
-import {getRepository} from "typeorm";
+import {getConnection, getRepository, QueryBuilder} from "typeorm";
 import {getFilterPagination} from "../shared/functions";
 import {Actor} from "../entity/Actor";
 
@@ -8,10 +8,36 @@ import {Actor} from "../entity/Actor";
  * Searches for Movies based on filters.
  * @param filter {MovieDTO} - Filter that can query genre, director, name, actors
  */
-export async function filterMovies(filter: MovieFilterDTO): Promise<Array<Movie>> {
+export async function filterMovies(filter: MovieFilterDTO): Promise<[Array<Movie>, number]> {
     const {skip, take} = getFilterPagination(filter)
     const movieRepo = getRepository(Movie)
-    return movieRepo.find({skip, take})
+    let movieQueryBuilder = movieRepo.createQueryBuilder('movie')
+        .leftJoinAndSelect("movie.actors", "actor")
+
+    if (filter.director) {
+        movieQueryBuilder = movieQueryBuilder.andWhere('movie.director = :d', {d: filter.director})
+    }
+    if (filter.genre) {
+        movieQueryBuilder = movieQueryBuilder.andWhere('movie.genre = :g', {g: filter.genre})
+    }
+
+    if (filter.title) {
+        const title =  `%${filter.title}%`
+        movieQueryBuilder = movieQueryBuilder.andWhere('movie.title ILIKE :t', {t: title})
+    }
+
+    if (filter.actors) {
+        if (Array.isArray(filter.actors)) {
+            filter.actors.forEach((act) => {
+                movieQueryBuilder = movieQueryBuilder.andWhere('actor.name = :a', {a: act})
+            })
+        } else {
+            movieQueryBuilder = movieQueryBuilder.andWhere('actor.name = :a', {a: filter.actors})
+        }
+    }
+    movieQueryBuilder.offset(skip).take(take)
+
+    return movieQueryBuilder.getManyAndCount()
 }
 
 /**

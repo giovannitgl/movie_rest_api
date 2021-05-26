@@ -6,7 +6,7 @@ import {
     Body,
     Get,
     Path,
-    Post,
+    Post, Query,
     Request,
     Response,
     Route,
@@ -26,8 +26,9 @@ import {
 import {createMovie, filterMovies, getMovieById} from "../dao/MovieDAO";
 import {createRating, getRateAvgByMovieId} from "../dao/RatingDAO";
 import {Movie} from "../entity/Movie";
+import {ListResponseDTO} from "../dto/ListDTO";
 
-const { BAD_REQUEST, NOT_FOUND, } = StatusCodes;
+const {BAD_REQUEST, NOT_FOUND,} = StatusCodes;
 
 @Route('movie')
 @Tags('Movie')
@@ -56,12 +57,23 @@ export default class MovieController {
     }
 
     /**
-     * List users according to filter
-     * @param filters
+     * List movies based on filters.
+     * @param entries Number of entries to be fetches
+     * @param page Number of page of entries. Ex: Page 0 Entries 10 = [0: 10), Page 1 Entries 10 [10, 20)
+     * @param director Name of director
+     * @param genre Name of movie genre
+     * @param title Title of the movie
+     * @param actors Names of actors to be filtered
      */
-    // @Get('/')
-    public async listMovies(filters: MovieFilterDTO): Promise<any> {
-        const filter: MovieFilterDTO = plainToClass(MovieFilterDTO, filters)
+    @Get('/')
+    public async listMovies(@Query() entries: number,
+                            @Query() page: number,
+                            @Query() director?: string,
+                            @Query() genre?: string,
+                            @Query() title?: string,
+                            @Query() actors?: Array<string>): Promise<ListResponseDTO> {
+        let filter: MovieFilterDTO = {entries, page, director, genre, actors, title}
+        filter = plainToClass(MovieFilterDTO, filter)
         try {
             const validation = await validate(filter)
             if (validation.length > 0) {
@@ -71,7 +83,11 @@ export default class MovieController {
             throw new ErrorHandler(BAD_REQUEST, err)
         }
 
-        return filterMovies(filter)
+        const data = await filterMovies(filter)
+        return {
+            data: data[0],
+            total: data[1]
+        }
     }
 
     /**
@@ -83,6 +99,7 @@ export default class MovieController {
     @Post('/')
     @SuccessResponse("201", "Created")
     @Response<IErrorHandler>('400', 'Invalid Data')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async registerMovie(@Body() body: MovieCreateDTO): Promise<MovieDTO> {
         const movie: MovieCreateDTO = plainToClass(MovieCreateDTO, body)
 
@@ -115,6 +132,7 @@ export default class MovieController {
     @Post('/:id/rate')
     @Response<IErrorHandler>('400', 'Invalid Data')
     @Response<IErrorHandler>('404', 'Not found')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async registerRate(@Path() id: number, @Body() payload: RateRequestDTO, @Request() user: User): Promise<RateRequestDTO> {
         const rating: RateRequestDTO = plainToClass(RateRequestDTO, payload)
         try {

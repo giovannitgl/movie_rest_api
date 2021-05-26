@@ -139,6 +139,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ListResponseDTO": {
+				"properties": {
+					"data": {
+						"items": {},
+						"type": "array",
+						"description": "Generic array *"
+					},
+					"total": {
+						"type": "number",
+						"format": "double",
+						"description": "Total records for search *"
+					}
+				},
+				"required": [
+					"data",
+					"total"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ActorDTO": {
 				"properties": {
 					"id": {
@@ -273,6 +293,16 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
 					"404": {
 						"description": "Not Found",
 						"content": {
@@ -322,7 +352,7 @@
 						}
 					},
 					"401": {
-						"description": "Unauthorized operation",
+						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -382,6 +412,16 @@
 					},
 					"400": {
 						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -546,6 +586,16 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
 					"404": {
 						"description": "Not Found",
 						"content": {
@@ -596,6 +646,16 @@
 					},
 					"400": {
 						"description": "Invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -718,6 +778,16 @@
 								}
 							}
 						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
@@ -792,6 +862,87 @@
 			}
 		},
 		"/movie": {
+			"get": {
+				"operationId": "ListMovies",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ListResponseDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "List movies based on filters.",
+				"tags": [
+					"Movie"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "Number of entries to be fetches",
+						"in": "query",
+						"name": "entries",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "Number of page of entries. Ex: Page 0 Entries 10 = [0: 10), Page 1 Entries 10 [10, 20)",
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"description": "Name of director",
+						"in": "query",
+						"name": "director",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Name of movie genre",
+						"in": "query",
+						"name": "genre",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Title of the movie",
+						"in": "query",
+						"name": "title",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Names of actors to be filtered",
+						"in": "query",
+						"name": "actors",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				]
+			},
 			"post": {
 				"operationId": "RegisterMovie",
 				"responses": {
@@ -807,6 +958,16 @@
 					},
 					"400": {
 						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -857,6 +1018,16 @@
 					},
 					"400": {
 						"description": "Invalid Data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorHandler"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
 						"content": {
 							"application/json": {
 								"schema": {

@@ -35,6 +35,7 @@ export default class UserController {
     @Get('/:id')
     @Response<IErrorHandler>('404', 'Not Found')
     @Response<IErrorHandler>('400', 'Bad id')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async getUser(@Path() id: number): Promise<UserDTO> {
         if (isNaN(id)) {
             throw new ErrorHandler(BAD_REQUEST, 'User id must be an int')
@@ -80,6 +81,7 @@ export default class UserController {
     @Security('jwt', ['User', 'Admin'])
     @Response<IErrorHandler>('404', 'Not Found')
     @Response<IErrorHandler>('401', 'Unauthorized operation')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async deleteUser(@Path() id: number, @Request() @Hidden() requestUser: User): Promise<boolean> {
         if (requestUser.type !== UserTypes.Admin && requestUser.id != id)  {
             throw new ErrorHandler(UNAUTHORIZED, 'User cannot delete other users.')
@@ -105,6 +107,7 @@ export default class UserController {
     @Security('jwt', ['User'])
     @Response<IErrorHandler>('404', 'Not Found')
     @Response<IErrorHandler>('400', 'Invalid Data')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async updateUser(@Path() id: number, @Body() body: UserDTO, @Request() requestUser: User): Promise<UserDTO> {
         if (requestUser.id !== id) {
             throw new ErrorHandler(UNAUTHORIZED, 'User can only edit himself')

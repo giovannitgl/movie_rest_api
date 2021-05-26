@@ -11,7 +11,11 @@ export class MovieFilterDTO extends ListFilterDTO {
     genre?: string
 
     @IsOptional()
-    actor?: string | Array<string>
+    @IsString()
+    title?: string
+
+    @IsOptional()
+    actors?: Array<string>
 }
 
 export class BaseMovieDTO {

@@ -16,6 +16,7 @@ const { BAD_REQUEST, UNAUTHORIZED} = StatusCodes;
 export default class AuthController {
     @Post('/')
     @Response<IErrorHandler>('400', 'Invalid data')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async authenticate(@Body() body: AuthRequestDTO): Promise<AuthDTO> {
         const auth: AuthRequestDTO = plainToClass(AuthRequestDTO, body)
 

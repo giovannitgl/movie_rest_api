@@ -82,6 +82,7 @@ export default class AdminController {
     @Security('jwt', ['Admin'])
     @Delete('/:id')
     @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async deleteAdmin(@Path() id: number): Promise<boolean> {
         const user = await getUserById(id)
         if (!user) {
@@ -104,6 +105,7 @@ export default class AdminController {
     @Put('/:id')
     @Response<IErrorHandler>('400', 'Invalid data')
     @Response<IErrorHandler>('404', 'Not Found')
+    @Response<IErrorHandler>('401', 'Unauthorized')
     public async updateAdmin(@Path() id: number, @Body() body: UserDTO, @Request() requestUser: User): Promise<UserDTO> {
         if (requestUser.id !== id) {
             throw new ErrorHandler(UNAUTHORIZED, 'Admin can only edit itself')
