@@ -1,5 +1,6 @@
 import {ValidationError} from "class-validator";
 import {ListFilterDTO} from "../dto/ListDTO";
+import bcrypt from 'bcrypt'
 
 /**
  * A function that transforms validation error in a string
@@ -25,4 +26,13 @@ export function printValidationError(validation: Array<ValidationError>) {
 export function getFilterPagination(filter: ListFilterDTO) {
     const {page, entries} = filter
     return {skip: page * entries, take: entries}
+}
+
+/**
+ * Hashes a password with salt
+ * @param pwd
+ */
+export function hashPassword(pwd: string): string {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    return bcrypt.hashSync(pwd, 10) as string
 }

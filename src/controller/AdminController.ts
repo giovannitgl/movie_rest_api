@@ -5,7 +5,7 @@ import {ErrorHandler} from "../middleware/ErrorMiddleware";
 import {User, UserTypes} from "../entity/User";
 import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
-import {printValidationError} from "../shared/functions";
+import {hashPassword, printValidationError} from "../shared/functions";
 import {createTypedUser, getUserDTO} from "./UserController";
 import {getUserById, updateUser} from "../dao/UserDAO";
 
@@ -51,6 +51,7 @@ export default class AdminController {
             throw new ErrorHandler(BAD_REQUEST, err)
         }
 
+        user.password = hashPassword(user.password)
         const newUser = await createTypedUser(user, UserTypes.Admin)
         return getUserDTO(newUser)
     }

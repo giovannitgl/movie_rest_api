@@ -75,6 +75,7 @@
     "typeorm": "0.2.32"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/command-line-args": "^5.0.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/express": "^4.17.11",

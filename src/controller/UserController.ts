@@ -6,7 +6,7 @@ import {validate} from "class-validator";
 import {Body, Delete, Get, Path, Post, Put, Route, Tags} from 'tsoa';
 import {User, UserTypes} from "../entity/User";
 import {createUser, getUserById, updateUser} from "../dao/UserDAO";
-import {printValidationError} from "../shared/functions";
+import {hashPassword, printValidationError} from "../shared/functions";
 
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
 
@@ -48,6 +48,7 @@ export default class UserController {
             throw new ErrorHandler(BAD_REQUEST, err)
         }
 
+        user.password = hashPassword(user.password)
         const newUser = await createTypedUser(user, UserTypes.User)
         return getUserDTO(newUser)
     }
