@@ -5,7 +5,7 @@ import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
 import {Body, Delete, Get, Path, Post, Put, Route, Tags} from 'tsoa';
 import {User, UserTypes} from "../entity/User";
-import {createUser, getUserById, updateUser} from "../dao/UserDao";
+import {createUser, getUserById, updateUser} from "../dao/UserDAO";
 import {printValidationError} from "../shared/functions";
 
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;

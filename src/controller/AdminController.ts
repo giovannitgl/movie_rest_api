@@ -7,7 +7,7 @@ import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
 import {printValidationError} from "../shared/functions";
 import {createTypedUser, getUserDTO} from "./UserController";
-import {getUserById, updateUser} from "../dao/UserDao";
+import {getUserById, updateUser} from "../dao/UserDAO";
 
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
 

@@ -3,10 +3,13 @@ import {ErrorHandler} from "../middleware/ErrorMiddleware";
 import {UserCreateDTO, UserDisplayDTO, UserDTO, UserInternalDTO} from "../dto/UserDTO";
 import {plainToClass} from "class-transformer";
 import {validate} from "class-validator";
-import {Body, Delete, Get, Path, Post, Put, Route, Tags} from 'tsoa';
+import {Body, Delete, Get, Path, Post, Put, Query, Route, Tags} from 'tsoa';
 import {User, UserTypes} from "../entity/User";
-import {createUser, getUserById, updateUser} from "../dao/UserDao";
+import {createUser, getUserById, updateUser} from "../dao/UserDAO";
 import {printValidationError} from "../shared/functions";
+import {ActorDTO, MovieCreateDTO, MovieDTO, MovieFilterDTO} from "../dto/MovieDTO";
+import {ListFilterDTO} from "../dto/ListDTO";
+import {createMovie, filterMovies} from "../dao/MovieDAO";
 
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCodes;
 
@@ -14,33 +17,32 @@ const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, NO_CONTENT } = StatusCode
 @Tags('Movie')
 export default class MovieController {
     /**
-     * Retrieves user by id
+     * Retrieves movie detail by id
      * @param id {int} User id
      */
     @Get('/:id')
-    public async getUser(@Path() id: number): Promise<UserDTO> {
+    public async getMovieDetails(@Path() id: number): Promise<UserDTO> {
         if (isNaN(id)) {
-            throw new ErrorHandler(BAD_REQUEST, 'User id must be an int')
+            throw new ErrorHandler(BAD_REQUEST, 'Movie id must be an int')
         }
 
         const user: User | undefined = await getUserById(id, UserTypes.User)
         if (user == null) {
-            throw new ErrorHandler(NOT_FOUND, 'User not found.')
+            throw new ErrorHandler(NOT_FOUND, 'Movie not found.')
         }
 
         return getUserDTO(user)
     }
 
-
     /**
-     * Creates user
-     * @param body {UserCreateDTO} Formatted user data to be created
+     * List users according to filter
+     * @param filters
      */
-    @Post('/')
-    public async registerUser(@Body() body: UserCreateDTO): Promise<UserDTO> {
-        const user: UserCreateDTO = plainToClass(UserCreateDTO, body)
+    @Get('/')
+    public async listMovies(@Query() filters: MovieFilterDTO): Promise<any> {
+        const filter: MovieFilterDTO = plainToClass(MovieFilterDTO, filters)
         try {
-            const validation = await validate(user)
+            const validation = await validate(filter)
             if (validation.length > 0) {
                 throw new ErrorHandler(BAD_REQUEST, printValidationError(validation))
             }
@@ -48,8 +50,34 @@ export default class MovieController {
             throw new ErrorHandler(BAD_REQUEST, err)
         }
 
-        const newUser = await createTypedUser(user, UserTypes.User)
-        return getUserDTO(newUser)
+        return filterMovies(filter)
+    }
+
+    /**
+     * Register a movie in the system.
+     * Only allowed by admins.
+     * @param body {UserCreateDTO} Formatted user data to be created
+     */
+    @Post('/')
+    public async registerMovie(@Body() body: UserCreateDTO): Promise<MovieDTO> {
+        const movie: MovieCreateDTO = plainToClass(MovieCreateDTO, body)
+
+        try {
+            const validation = await validate(movie)
+            if (validation.length > 0) {
+                throw new ErrorHandler(BAD_REQUEST, printValidationError(validation))
+            }
+        } catch (err) {
+            throw new ErrorHandler(BAD_REQUEST, err)
+        }
+
+        const actors: Array<ActorDTO> = movie.actors.map((actor) => ({name: actor}))
+        const movieCreateData: MovieDTO = {
+            ...movie,
+            actors,
+        }
+
+        return await createMovie(movieCreateData)
     }
 
     /**

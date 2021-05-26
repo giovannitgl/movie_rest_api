@@ -28,7 +28,7 @@ export class Movie {
     @Column({type: 'varchar', length: 30})
     genre: string
 
-    @ManyToMany(() => Actor)
+    @ManyToMany(() => Actor, (act) => act.movies)
     @JoinTable()
     actors: Actor[];
 

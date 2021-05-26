@@ -11,6 +11,8 @@ import {ErrorHandler, ErrorMiddleware} from './middleware/ErrorMiddleware'
 import {createConnection} from "typeorm";
 import UserRouter from "./routes/UserRoutes";
 import AdminRouter from "./routes/AdminRoutes";
+import MovieRouter from "./routes/MovieRoutes";
+
 import logger from "./shared/Logger";
 
 const app = express();
@@ -47,6 +49,7 @@ createConnection().then(() => {
 
     app.use("/user", UserRouter)
     app.use("/admin", AdminRouter)
+    app.use("/movie", MovieRouter)
 
 // Print API errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

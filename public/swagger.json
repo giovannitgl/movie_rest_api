@@ -59,6 +59,52 @@
 				],
 				"type": "object",
 				"additionalProperties": true
+			},
+			"ActorDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"MovieDTO": {
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"synopsis": {
+						"type": "string"
+					},
+					"director": {
+						"type": "string"
+					},
+					"genre": {
+						"type": "string"
+					},
+					"actors": {
+						"items": {
+							"$ref": "#/components/schemas/ActorDTO"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"title",
+					"director",
+					"genre",
+					"actors"
+				],
+				"type": "object",
+				"additionalProperties": true
 			}
 		},
 		"securitySchemes": {}
@@ -344,6 +390,149 @@
 				"parameters": [],
 				"requestBody": {
 					"description": "Body of the user to be created as admin",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/movie/{id}": {
+			"get": {
+				"operationId": "GetMovieDetails",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves movie detail by id",
+				"tags": [
+					"Movie"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "User id",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				},
+				"description": "Excludes user from system",
+				"tags": [
+					"Movie"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to exclude",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Updates information for an user",
+				"tags": [
+					"Movie"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"description": "user id to update",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "user data to be updated",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/movie": {
+			"post": {
+				"operationId": "RegisterMovie",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MovieDTO"
+								}
+							}
+						}
+					}
+				},
+				"description": "Register a movie in the system.\nOnly allowed by admins.",
+				"tags": [
+					"Movie"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "Formatted user data to be created",
 					"required": true,
 					"content": {
 						"application/json": {
