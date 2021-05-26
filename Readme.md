@@ -6,7 +6,7 @@ To check the documentation for the api check the ``/docs`` url
 Requirements (if no docker):
 - Running Postgres instance
     - Make sure the URL for the connection is an env var: DATABASE_URL
-    - Database user is ``movies``
+    - Database is ``movies``
 
 
 Attention: This repository was only tested in a Linux environments
